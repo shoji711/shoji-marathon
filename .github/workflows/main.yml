@@ -7,28 +7,29 @@ on:
 
 jobs:
   deploy-staging:
-    name: Deploy to Staging (dev.marathon)
+    name: Deploy to Staging (dev)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: SSH to Staging and deploy
+      - name: Deploy to Staging via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: dev.marathon.rplearn.net
           username: tomoya_shoji
           key: ${{ secrets.STG_SSH_KEY }}
+          passphrase: ${{ secrets.STG_SSH_PASSPHRASE }}
           script: |
             set -e
             cd /app/develop
-            bash /app/develop/deploy.sh tomoya_shoji
+            bash deploy.sh tomoya_shoji
 
       - name: Smoke test (Staging)
         run: |
-          set -e
-          curl -fsS -H 'Host: dev.marathon.rplearn.net' http://dev.marathon.rplearn.net/tomoya_shoji/customer/add.html >/dev/null
+          curl -fsS -H "Host: dev.marathon.rplearn.net" \
+            http://dev.marathon.rplearn.net/tomoya_shoji/customer/add.html > /dev/null
 
   deploy-production:
     name: Deploy to Production (marathon)
@@ -39,19 +40,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: SSH to Production and deploy
+      - name: Deploy to Production via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: marathon.rplearn.net
           username: tomoya_shoji
           key: ${{ secrets.PRD_SSH_KEY }}
+          passphrase: ${{ secrets.PRD_SSH_PASSPHRASE }}
           script: |
             set -e
             cd /app/tomoya_shoji
-            bash /app/tomoya_shoji/deploy.sh tomoya_shoji
+            bash deploy.sh tomoya_shoji
 
       - name: Smoke test (Production)
         run: |
-          set -e
-          curl -fsS -H 'Host: marathon.rplearn.net' http://marathon.rplearn.net/tomoya_shoji/customer/add.html >/dev/null
+          curl -fsS -H "Host: marathon.rplearn.net" \
+            http://marathon.rplearn.net/tomoya_shoji/customer/add.html > /dev/null
 
