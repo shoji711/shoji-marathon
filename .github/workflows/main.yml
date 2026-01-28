@@ -23,7 +23,7 @@ jobs:
           script: |
             set -e
             cd /app/develop
-            bash /app/develop/deploy.sh tomoya_shoji
+            bash /app/deploy.sh tomoya_shoji
 
       - name: Smoke test (Staging)
         run: |
@@ -49,7 +49,7 @@ jobs:
           script: |
             set -e
             cd /app/tomoya_shoji
-            bash /app/tomoya_shoji/deploy.sh tomoya_shoji
+            bash ./deploy.sh tomoya_shoji
 
       - name: Smoke test (Production)
         run: |
