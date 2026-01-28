@@ -20,14 +20,14 @@ jobs:
           host: dev.marathon.rplearn.net
           username: tomoya_shoji
           key: ${{ secrets.STG_SSH_KEY }}
-          passphrase: ${{ secrets.STG_SSH_PASSPHRASE }}
           script: |
             set -e
             cd /app/develop
-            bash deploy.sh tomoya_shoji
+            bash /app/develop/deploy.sh tomoya_shoji
 
       - name: Smoke test (Staging)
         run: |
+          set -e
           curl -fsS -H "Host: dev.marathon.rplearn.net" \
             http://dev.marathon.rplearn.net/tomoya_shoji/customer/add.html > /dev/null
 
@@ -46,14 +46,14 @@ jobs:
           host: marathon.rplearn.net
           username: tomoya_shoji
           key: ${{ secrets.PRD_SSH_KEY }}
-          passphrase: ${{ secrets.PRD_SSH_PASSPHRASE }}
           script: |
             set -e
             cd /app/tomoya_shoji
-            bash deploy.sh tomoya_shoji
+            bash /app/tomoya_shoji/deploy.sh tomoya_shoji
 
       - name: Smoke test (Production)
         run: |
+          set -e
           curl -fsS -H "Host: marathon.rplearn.net" \
             http://marathon.rplearn.net/tomoya_shoji/customer/add.html > /dev/null
 
