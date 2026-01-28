@@ -24,14 +24,22 @@ jobs:
             set -e
             echo "### whoami"; whoami
             echo "### hostname"; hostname
-            echo "### pwd(before)"; pwd
-            echo "### cd /app/develop && git status"
+            echo "### pull /app/develop"
             cd /app/develop
-            pwd
-            git status -sb || true
+            git pull
 
-            echo "### run deploy from /app/develop"
-            bash /app/deploy.sh tomoya_shoji
+            echo "### deploy web files to nginx dir"
+            WEB_DIR="/usr/share/nginx/html/tomoya_shoji"
+            rm -rf "${WEB_DIR:?}/"*
+            cp -ipr ./src/web/* "$WEB_DIR/"
+
+            # dev側で prod_config.js を使う構成なら残してOK（無ければ何もしない）
+            if [ -f "$WEB_DIR/prod_config.js" ]; then
+              mv "$WEB_DIR/prod_config.js" "$WEB_DIR/config.js"
+            fi
+
+            echo "### show deployed config.js"
+            test -f "$WEB_DIR/config.js" && sed -n '1,40p' "$WEB_DIR/config.js" || true
 
       - name: Smoke test (Staging)
         run: |
@@ -57,7 +65,7 @@ jobs:
           script: |
             set -e
             cd /app/tomoya_shoji
-            git status -sb || true
+            git pull
             bash ./deploy.sh tomoya_shoji
 
       - name: Smoke test (Production)
